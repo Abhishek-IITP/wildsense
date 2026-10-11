@@ -107,6 +107,28 @@
     font-family: var(--font-sans);
   }
   ::selection { background: var(--sage); color: var(--forest); }
+
+  button,
+  [role="button"],
+  a,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="checkbox"],
+  input[type="radio"],
+  select,
+  summary,
+  label[for],
+  [tabindex]:not([tabindex="-1"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  input:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @utility font-display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
