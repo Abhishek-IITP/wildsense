@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: wildsense
+    env: node
+    plan: free
+    buildCommand: bun install && bun run build
+    startCommand: bun run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: wildsense
