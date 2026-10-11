@@ -22,7 +22,6 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   }, [theme]);
 
   const tone = overlay ? "text-scene-foreground" : "text-foreground";
-  const link = cn("text-sm opacity-80 transition-opacity hover:opacity-100", tone);
 
   return (
     <header className={cn("absolute inset-x-0 top-0 z-30", tone)}>
@@ -30,12 +29,18 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         <Link href="/" aria-label="WildSense home">
           <Logo />
         </Link>
-        <nav className="flex items-center gap-3 sm:gap-5 md:gap-7">
+        <nav className="flex items-center gap-2.5 sm:gap-4 md:gap-6">
           <Link
             href="/"
             className={cn(
-              link,
-              pathname === "/" && "!opacity-100 underline underline-offset-8",
+              "text-sm font-medium transition-colors hover:text-moss",
+              overlay
+                ? pathname === "/"
+                  ? "text-scene-foreground font-semibold underline underline-offset-8 decoration-sage decoration-2"
+                  : "text-scene-foreground/80 hover:text-scene-foreground"
+                : pathname === "/"
+                  ? "text-moss font-semibold underline underline-offset-8 decoration-moss decoration-2"
+                  : "text-foreground/80 hover:text-foreground",
             )}
           >
             Explore
@@ -43,33 +48,65 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
           <Link
             href="/journal"
             className={cn(
-              link,
-              pathname === "/journal" && "!opacity-100 underline underline-offset-8",
+              "text-sm font-medium transition-colors hover:text-moss",
+              overlay
+                ? pathname === "/journal"
+                  ? "text-scene-foreground font-semibold underline underline-offset-8 decoration-sage decoration-2"
+                  : "text-scene-foreground/80 hover:text-scene-foreground"
+                : pathname === "/journal"
+                  ? "text-moss font-semibold underline underline-offset-8 decoration-moss decoration-2"
+                  : "text-foreground/80 hover:text-foreground",
             )}
           >
             Journal
           </Link>
 
+          {/* Soundscape Ambient Nature Audio Button */}
           <button
             onClick={() => setSoundOpen(!soundOpen)}
             aria-label="Toggle ambient nature soundscape"
             className={cn(
-              "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition",
-              soundOpen
-                ? "border-moss bg-moss/20 text-moss"
-                : "border-border/60 hover:border-border text-muted-foreground hover:text-foreground bg-card/40 backdrop-blur-sm",
+              "flex items-center gap-1.5 rounded-full border px-2.5 sm:px-3 py-1.5 text-xs font-medium transition-all shadow-xs active:scale-95",
+              overlay
+                ? soundOpen
+                  ? "border-sage bg-sage text-scene shadow-sage/30"
+                  : "border-scene-foreground/30 bg-scene-foreground/15 text-scene-foreground hover:bg-scene-foreground/25 hover:border-scene-foreground/50 backdrop-blur-md"
+                : soundOpen
+                  ? "border-moss bg-moss text-ivory shadow-sm"
+                  : "border-foreground/20 bg-card text-foreground hover:border-moss/70 hover:bg-secondary hover:text-moss shadow-sm",
             )}
             title="Ambient Nature Soundscape"
           >
-            <Headphones className="h-3.5 w-3.5" />
-            <span className="hidden md:inline font-sans">Soundscape</span>
+            <Headphones
+              className={cn(
+                "h-3.5 w-3.5 shrink-0 transition-colors",
+                overlay
+                  ? soundOpen
+                    ? "text-scene"
+                    : "text-sage"
+                  : soundOpen
+                    ? "text-ivory"
+                    : "text-moss",
+              )}
+            />
+            <span className="font-sans">Soundscape</span>
           </button>
 
-          <SyncStatusBadge />
-          <AiDot status={status} className="hidden lg:inline-flex" />
+          <SyncStatusBadge overlay={overlay} />
+          <AiDot status={status} className={cn("hidden lg:inline-flex", overlay ? "text-scene-foreground/80" : "text-foreground/80")} />
 
-          <button onClick={() => setOpen(true)} aria-label="Settings" className={cn(link, "rounded-full p-1")}>
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.4">
+          {/* Settings Button */}
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Settings"
+            className={cn(
+              "flex items-center justify-center rounded-full border p-1.5 sm:p-2 transition-all active:scale-95 shadow-xs",
+              overlay
+                ? "border-scene-foreground/30 bg-scene-foreground/15 text-scene-foreground hover:bg-scene-foreground/25 hover:border-scene-foreground/50"
+                : "border-foreground/20 bg-card text-foreground hover:border-moss/70 hover:bg-secondary hover:text-moss shadow-sm",
+            )}
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6">
               <circle cx="12" cy="12" r="3" />
               <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" />
             </svg>
@@ -81,11 +118,11 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
       {soundOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
+            className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-[2px]"
             onClick={() => setSoundOpen(false)}
             aria-hidden="true"
           />
-          <div className="fixed right-3 top-20 z-50 sm:right-8 sm:top-20 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="fixed right-3 top-20 z-[100] sm:right-8 sm:top-20 animate-in fade-in slide-in-from-top-2 duration-200">
             <SoundscapePlayer onClose={() => setSoundOpen(false)} />
           </div>
         </>
