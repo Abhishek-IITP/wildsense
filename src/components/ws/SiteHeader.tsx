@@ -79,9 +79,16 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
 
       {/* Floating soundscape popover widget */}
       {soundOpen && (
-        <div className="absolute right-5 top-18 z-40 w-80 sm:right-10 animate-in fade-in slide-in-from-top-2 duration-200">
-          <SoundscapePlayer />
-        </div>
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
+            onClick={() => setSoundOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed right-3 top-20 z-50 sm:right-8 sm:top-20 animate-in fade-in slide-in-from-top-2 duration-200">
+            <SoundscapePlayer onClose={() => setSoundOpen(false)} />
+          </div>
+        </>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>

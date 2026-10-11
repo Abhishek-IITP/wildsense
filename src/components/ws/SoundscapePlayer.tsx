@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Volume2, VolumeX, Play, Pause, Trees, Waves, CloudRain, Moon } from "lucide-react";
+import {
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  Trees,
+  Waves,
+  CloudRain,
+  Moon,
+  X,
+  Headphones,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type SoundPreset = "forest" | "brook" | "rain" | "dusk";
@@ -9,21 +20,55 @@ export type SoundPreset = "forest" | "brook" | "rain" | "dusk";
 interface PresetConfig {
   id: SoundPreset;
   name: string;
-  subtitle: string;
+  tagline: string;
+  description: string;
   icon: typeof Trees;
-  color: string;
+  accent: string;
+  pillBorder: string;
 }
 
 export const PRESETS: PresetConfig[] = [
-  { id: "forest", name: "Canopy Wind & Birds", subtitle: "Swaying pines and distant morning warblers", icon: Trees, color: "text-moss" },
-  { id: "brook", name: "Meadow Brook", subtitle: "Cool mountain stream tumbling over mossy stones", icon: Waves, color: "text-sage" },
-  { id: "rain", name: "Gentle Rain", subtitle: "Soft droplets pattering on broad leaves", icon: CloudRain, color: "text-earth" },
-  { id: "dusk", name: "Twilight Crickets", subtitle: "Warm dusk breeze with gentle rhythmic pulses", icon: Moon, color: "text-terracotta" },
+  {
+    id: "forest",
+    name: "Canopy Wind & Birds",
+    tagline: "Swaying pines & warblers",
+    description: "Deep wind through hemlock boughs with organic distant bird warbles.",
+    icon: Trees,
+    accent: "text-moss bg-moss/15 border-moss/40",
+    pillBorder: "hover:border-moss/50",
+  },
+  {
+    id: "brook",
+    name: "Meadow Brook",
+    tagline: "Cool mountain stream",
+    description: "Gentle bubbling water tumbling across mossy granite stones.",
+    icon: Waves,
+    accent: "text-sage bg-sage/20 border-sage/40",
+    pillBorder: "hover:border-sage/50",
+  },
+  {
+    id: "rain",
+    name: "Gentle Rain",
+    tagline: "Soft drops on broad leaves",
+    description: "Calm, rhythmic rainfall pattering softly on summer canopy foliage.",
+    icon: CloudRain,
+    accent: "text-earth bg-earth/15 border-earth/40",
+    pillBorder: "hover:border-earth/50",
+  },
+  {
+    id: "dusk",
+    name: "Twilight Crickets",
+    tagline: "Warm evening cadence",
+    description: "Dusk breeze with the rhythmic, peaceful hum of field crickets.",
+    icon: Moon,
+    accent: "text-terracotta bg-terracotta/15 border-terracotta/40",
+    pillBorder: "hover:border-terracotta/50",
+  },
 ];
 
 /**
  * Pure offline Web Audio synthesizer for ambient nature soundscapes.
- * Operates without network dependencies or external audio files.
+ * Operates with 0 network dependencies or external audio files.
  */
 class NatureAudioEngine {
   private ctx: AudioContext | null = null;
@@ -36,21 +81,23 @@ class NatureAudioEngine {
 
   private getContext(): AudioContext {
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AudioCtx();
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
       this.masterGain.connect(this.ctx.destination);
     }
     if (this.ctx.state === "suspended") {
-      this.ctx.resume();
+      void this.ctx.resume();
     }
     return this.ctx;
   }
 
   setVolume(val: number) {
     if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setTargetAtTime(Math.max(0, Math.min(1, val)), this.ctx.currentTime, 0.05);
+      this.masterGain.gain.setTargetAtTime(Math.max(0, Math.min(1, val)), this.ctx.currentTime, 0.04);
     }
   }
 
@@ -68,20 +115,25 @@ class NatureAudioEngine {
         if ("stop" in s && typeof s.stop === "function") s.stop();
         if ("disconnect" in s && typeof s.disconnect === "function") s.disconnect();
       } catch {
-        // already disconnected
+        // disconnected
       }
     }
     this.activeSources = [];
   }
 
-  // Generate pink/brown noise buffer
   private createNoiseBuffer(type: "pink" | "brown" | "white", durationSeconds = 5): AudioBuffer {
     const ctx = this.getContext();
     const bufferSize = ctx.sampleRate * durationSeconds;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const output = buffer.getChannelData(0);
 
-    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    let b0 = 0,
+      b1 = 0,
+      b2 = 0,
+      b3 = 0,
+      b4 = 0,
+      b5 = 0,
+      b6 = 0;
     let lastOut = 0.0;
 
     for (let i = 0; i < bufferSize; i++) {
@@ -91,14 +143,13 @@ class NatureAudioEngine {
       } else if (type === "pink") {
         b0 = 0.99886 * b0 + white * 0.0555179;
         b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
+        b2 = 0.969 * b2 + white * 0.153852;
+        b3 = 0.8665 * b3 + white * 0.3104856;
+        b4 = 0.55 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.016898;
         output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
         b6 = white * 0.115926;
       } else {
-        // brown
         output[i] = (lastOut + 0.02 * white) / 1.02;
         lastOut = output[i];
         output[i] *= 0.5;
@@ -107,7 +158,6 @@ class NatureAudioEngine {
     return buffer;
   }
 
-  // Play a realistic gentle bird chirping sound
   private playBirdChirp() {
     if (!this.ctx || !this.isRunning || this.activePreset !== "forest") return;
     try {
@@ -124,7 +174,7 @@ class NatureAudioEngine {
       osc.frequency.exponentialRampToValueAtTime(startFreq + 200, now + 0.22);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.045, now + 0.05);
+      gain.gain.linearRampToValueAtTime(0.04, now + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
 
       osc.connect(gain);
@@ -133,11 +183,10 @@ class NatureAudioEngine {
       osc.start(now);
       osc.stop(now + 0.26);
     } catch {
-      // Audio node scheduling safe guard
+      // scheduled safe
     }
   }
 
-  // Play a cricket pulse
   private playCricketPulse() {
     if (!this.ctx || !this.isRunning || this.activePreset !== "dusk") return;
     try {
@@ -167,7 +216,7 @@ class NatureAudioEngine {
       osc.start(now);
       osc.stop(now + 0.16);
     } catch {
-      // ignore
+      // scheduled safe
     }
   }
 
@@ -178,7 +227,6 @@ class NatureAudioEngine {
     this.isRunning = true;
 
     if (preset === "forest") {
-      // Wind through trees: Brown noise + resonant low-pass filter modulated by LFO
       const noiseBuffer = this.createNoiseBuffer("brown", 6);
       const source = ctx.createBufferSource();
       source.buffer = noiseBuffer;
@@ -208,7 +256,6 @@ class NatureAudioEngine {
       lfo.start();
       this.activeSources.push(source, lfo, filter, windGain, lfoGain);
 
-      // Periodic bird chirps every 3 to 7 seconds
       const scheduleNextChirp = () => {
         if (!this.isRunning || this.activePreset !== "forest") return;
         this.playBirdChirp();
@@ -217,7 +264,6 @@ class NatureAudioEngine {
       };
       this.birdTimer = window.setTimeout(scheduleNextChirp, 1500);
     } else if (preset === "brook") {
-      // Babbling brook: Pink noise modulated with mid-band filters
       const noiseBuffer = this.createNoiseBuffer("pink", 5);
       const source = ctx.createBufferSource();
       source.buffer = noiseBuffer;
@@ -246,7 +292,6 @@ class NatureAudioEngine {
       lfo.start();
       this.activeSources.push(source, lfo, bandpass, brookGain, lfoGain);
     } else if (preset === "rain") {
-      // Gentle Rain: Pink & white noise mix with gentle high-cut
       const noiseBuffer = this.createNoiseBuffer("pink", 4);
       const source = ctx.createBufferSource();
       source.buffer = noiseBuffer;
@@ -266,7 +311,6 @@ class NatureAudioEngine {
       source.start();
       this.activeSources.push(source, filter, rainGain);
     } else if (preset === "dusk") {
-      // Dusk breeze with crickets
       const noiseBuffer = this.createNoiseBuffer("brown", 5);
       const source = ctx.createBufferSource();
       source.buffer = noiseBuffer;
@@ -286,7 +330,6 @@ class NatureAudioEngine {
       source.start();
       this.activeSources.push(source, filter, breezeGain);
 
-      // Crickets cadence
       const scheduleNextCricket = () => {
         if (!this.isRunning || this.activePreset !== "dusk") return;
         this.playCricketPulse();
@@ -303,34 +346,64 @@ class NatureAudioEngine {
   }
 }
 
-// Global singleton instance so soundscape can persist or be accessed from active mission
 export const globalSoundEngine = typeof window !== "undefined" ? new NatureAudioEngine() : null;
+
+// Animated live equalizer wave
+function AudioBars({ isPlaying }: { isPlaying: boolean }) {
+  return (
+    <div className="flex items-center gap-[2px] h-3.5 px-1">
+      <span
+        className={cn(
+          "w-[2.5px] rounded-full bg-moss transition-all duration-300",
+          isPlaying ? "h-3 animate-[pulse_0.7s_ease-in-out_infinite]" : "h-1 opacity-40",
+        )}
+      />
+      <span
+        className={cn(
+          "w-[2.5px] rounded-full bg-moss transition-all duration-300",
+          isPlaying ? "h-4 animate-[pulse_0.9s_ease-in-out_infinite_0.15s]" : "h-1.5 opacity-40",
+        )}
+      />
+      <span
+        className={cn(
+          "w-[2.5px] rounded-full bg-moss transition-all duration-300",
+          isPlaying ? "h-2.5 animate-[pulse_0.6s_ease-in-out_infinite_0.3s]" : "h-1 opacity-40",
+        )}
+      />
+      <span
+        className={cn(
+          "w-[2.5px] rounded-full bg-moss transition-all duration-300",
+          isPlaying ? "h-3.5 animate-[pulse_0.8s_ease-in-out_infinite_0.2s]" : "h-1.5 opacity-40",
+        )}
+      />
+    </div>
+  );
+}
 
 export function SoundscapePlayer({
   className,
   compact = false,
   autoPlay = false,
   preset: initialPreset = "forest",
+  onClose,
 }: {
   className?: string;
   compact?: boolean;
   autoPlay?: boolean;
   preset?: SoundPreset;
+  onClose?: () => void;
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPreset, setCurrentPreset] = useState<SoundPreset>(initialPreset);
-  const [volume, setVolume] = useState(0.6);
+  const [volume, setVolume] = useState(0.65);
   const [isMuted, setIsMuted] = useState(false);
-  const [showPresets, setShowPresets] = useState(false);
+  const [showPresetsCompact, setShowPresetsCompact] = useState(false);
 
   useEffect(() => {
     if (autoPlay && globalSoundEngine) {
       globalSoundEngine.start(currentPreset);
       setIsPlaying(true);
     }
-    return () => {
-      // stop on unmount if requested
-    };
   }, [autoPlay, currentPreset]);
 
   const togglePlay = () => {
@@ -347,7 +420,7 @@ export function SoundscapePlayer({
 
   const handlePresetSelect = (p: SoundPreset) => {
     setCurrentPreset(p);
-    setShowPresets(false);
+    setShowPresetsCompact(false);
     if (globalSoundEngine && isPlaying) {
       globalSoundEngine.start(p);
     }
@@ -370,122 +443,215 @@ export function SoundscapePlayer({
   };
 
   const activeMeta = PRESETS.find((p) => p.id === currentPreset) || PRESETS[0]!;
-  const IconComponent = activeMeta.icon;
+  const ActiveIcon = activeMeta.icon;
 
+  // Compact mode: used inside active mission timer
   if (compact) {
     return (
-      <div className={cn("inline-flex items-center gap-2 rounded-full border border-border bg-card/90 px-3 py-1.5 shadow-sm backdrop-blur-md", className)}>
-        <button
-          onClick={togglePlay}
-          aria-label={isPlaying ? "Pause ambient soundscape" : "Play ambient nature soundscape"}
-          className={cn(
-            "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
-            isPlaying ? "bg-moss text-ivory" : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-          )}
-        >
-          {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="ml-0.5 h-3.5 w-3.5" />}
-        </button>
-        <span className="font-display text-sm tracking-wide text-foreground/90">{activeMeta.name}</span>
-        <div className="flex items-center gap-1">
-          {isPlaying && (
-            <span className="flex h-2 w-2 items-center justify-center">
-              <span className="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-moss" />
-            </span>
-          )}
+      <div className={cn("relative inline-flex flex-col items-center", className)}>
+        <div className="flex items-center gap-2.5 rounded-full border border-scene-foreground/20 bg-scene-foreground/10 px-3.5 py-1.5 shadow-sm backdrop-blur-md text-scene-foreground transition-colors hover:bg-scene-foreground/15">
           <button
-            onClick={() => setShowPresets(!showPresets)}
-            className="text-xs text-muted-foreground hover:text-foreground"
-            title="Switch atmosphere"
+            onClick={togglePlay}
+            aria-label={isPlaying ? "Pause ambient soundscape" : "Play ambient nature soundscape"}
+            className={cn(
+              "flex h-7 w-7 items-center justify-center rounded-full transition-transform active:scale-95 shadow-xs",
+              isPlaying
+                ? "bg-sage text-scene shadow-sage/30"
+                : "bg-scene-foreground/20 text-scene-foreground hover:bg-scene-foreground/30",
+            )}
+          >
+            {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="ml-0.5 h-3.5 w-3.5" />}
+          </button>
+
+          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setShowPresetsCompact(!showPresetsCompact)}>
+            <ActiveIcon className="h-4 w-4 text-sage" />
+            <span className="font-display text-sm tracking-wide">{activeMeta.name}</span>
+            <AudioBars isPlaying={isPlaying} />
+          </div>
+
+          <button
+            onClick={() => setShowPresetsCompact(!showPresetsCompact)}
+            className="rounded-full bg-scene-foreground/10 px-2 py-0.5 text-[11px] font-sans opacity-80 hover:opacity-100 transition-opacity"
           >
             Change
           </button>
         </div>
+
+        {/* Compact Preset Picker Dropdown */}
+        {showPresetsCompact && (
+          <div className="absolute top-11 z-50 w-72 rounded-xl border border-scene-foreground/20 bg-scene/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between px-2 py-1 mb-1 border-b border-scene-foreground/10">
+              <span className="eyebrow text-[10px] text-sage opacity-80">Atmosphere</span>
+              <button onClick={() => setShowPresetsCompact(false)} className="text-scene-foreground/60 hover:text-scene-foreground">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <div className="space-y-1">
+              {PRESETS.map((p) => {
+                const PIcon = p.icon;
+                const isSelected = p.id === currentPreset;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => handlePresetSelect(p.id)}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-colors",
+                      isSelected
+                        ? "bg-scene-foreground/20 font-medium text-scene-foreground shadow-xs"
+                        : "text-scene-foreground/70 hover:bg-scene-foreground/10 hover:text-scene-foreground",
+                    )}
+                  >
+                    <PIcon className="h-4 w-4 text-sage shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-display text-sm leading-tight">{p.name}</p>
+                      <p className="truncate text-[10px] opacity-60">{p.tagline}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
+  // Full Premium Soundscape Popover Card
   return (
-    <div className={cn("relative rounded-xl border border-border bg-card/95 p-4 shadow-md backdrop-blur-md transition-all", className)}>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-full bg-secondary", activeMeta.color)}>
-            <IconComponent className="h-5 w-5" />
+    <div
+      className={cn(
+        "w-[340px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border/80 bg-card/95 text-foreground shadow-[0_20px_50px_rgba(0,0,0,0.2)] backdrop-blur-2xl transition-all overflow-hidden",
+        className,
+      )}
+    >
+      {/* Header bar */}
+      <div className="flex items-center justify-between border-b border-border/50 px-4 py-3 bg-secondary/30">
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/20 text-moss">
+            <Headphones className="h-3.5 w-3.5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <p className="font-display text-lg leading-tight text-foreground">{activeMeta.name}</p>
-              {isPlaying && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-moss/10 px-2 py-0.5 text-[10px] font-medium text-moss">
-                  <span className="h-1.5 w-1.5 rounded-full bg-moss animate-pulse" />
-                  Playing live
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">{activeMeta.subtitle}</p>
+            <span className="eyebrow text-[10px] text-moss font-semibold block leading-none">
+              Soundscape · Offline
+            </span>
+            <span className="font-display text-xs text-muted-foreground">Synthesized Ambience</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowPresets(!showPresets)}
-            className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition hover:border-foreground/30 hover:text-foreground"
-          >
-            Atmosphere
-          </button>
-          <button
-            onClick={togglePlay}
-            className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-95",
-              isPlaying ? "bg-moss text-ivory shadow-sm" : "bg-primary text-primary-foreground hover:opacity-90",
-            )}
-            aria-label={isPlaying ? "Pause audio" : "Play nature sounds"}
-          >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
-          </button>
+        <div className="flex items-center gap-1.5">
+          <AudioBars isPlaying={isPlaying} />
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="ml-1 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              aria-label="Close soundscape player"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Preset selection dropdown */}
-      {showPresets && (
-        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border pt-3">
-          {PRESETS.map((p) => {
-            const PIcon = p.icon;
-            const isSelected = p.id === currentPreset;
-            return (
-              <button
-                key={p.id}
-                onClick={() => handlePresetSelect(p.id)}
-                className={cn(
-                  "flex items-center gap-2 rounded-lg p-2 text-left text-xs transition-colors",
-                  isSelected ? "bg-secondary font-medium text-foreground" : "hover:bg-muted text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <PIcon className={cn("h-4 w-4", p.color)} />
-                <div className="truncate">
-                  <p className="truncate">{p.name}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* Main active atmosphere hero */}
+      <div className="p-4">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-secondary/40 p-3.5">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-xs transition-colors", activeMeta.accent)}>
+              <ActiveIcon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <h4 className="font-display text-lg leading-tight truncate text-foreground">{activeMeta.name}</h4>
+              </div>
+              <p className="text-[11px] text-muted-foreground truncate">{activeMeta.tagline}</p>
+            </div>
+          </div>
 
-      {/* Volume slider row */}
-      <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-2 text-muted-foreground">
-        <button onClick={toggleMute} className="p-0.5 hover:text-foreground">
-          {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        </button>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.02"
-          value={isMuted ? 0 : volume}
-          onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-          className="h-1.5 w-full cursor-pointer accent-moss bg-secondary rounded-lg appearance-none"
-          aria-label="Soundscape volume"
-        />
-        <span className="text-[11px] tabular-nums">{Math.round((isMuted ? 0 : volume) * 100)}%</span>
+          <button
+            onClick={togglePlay}
+            className={cn(
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all active:scale-95 shadow-md",
+              isPlaying
+                ? "bg-moss text-ivory ring-4 ring-moss/20"
+                : "bg-primary text-primary-foreground hover:opacity-90",
+            )}
+            aria-label={isPlaying ? "Pause ambient soundscape" : "Play ambient soundscape"}
+          >
+            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
+          </button>
+        </div>
+
+        {/* Atmosphere description quote */}
+        <p className="mt-2.5 px-1 font-hand text-sm text-muted-foreground italic leading-snug">
+          "{activeMeta.description}"
+        </p>
+
+        {/* Atmosphere Presets grid */}
+        <div className="mt-4">
+          <p className="eyebrow text-[10px] text-muted-foreground mb-2 px-1">Atmospheres</p>
+          <div className="grid grid-cols-2 gap-2">
+            {PRESETS.map((p) => {
+              const PIcon = p.icon;
+              const isSelected = p.id === currentPreset;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => handlePresetSelect(p.id)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl border p-2.5 text-left transition-all",
+                    isSelected
+                      ? "border-moss bg-moss/10 shadow-xs"
+                      : "border-border/60 bg-card/60 hover:border-border hover:bg-secondary/50",
+                  )}
+                >
+                  <PIcon
+                    className={cn(
+                      "h-4 w-4 shrink-0 transition-colors",
+                      isSelected ? "text-moss" : "text-muted-foreground",
+                    )}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={cn(
+                        "truncate text-xs leading-tight font-display",
+                        isSelected ? "text-foreground font-semibold" : "text-foreground/80",
+                      )}
+                    >
+                      {p.name}
+                    </p>
+                    <p className="truncate text-[10px] text-muted-foreground">{p.tagline}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Volume & Mixer row */}
+        <div className="mt-4 flex items-center gap-3 rounded-xl border border-border/50 bg-secondary/30 px-3 py-2 text-muted-foreground">
+          <button
+            onClick={toggleMute}
+            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-secondary hover:text-foreground transition-colors shrink-0"
+            aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+          >
+            {isMuted || volume === 0 ? <VolumeX className="h-4 w-4 text-destructive" /> : <Volume2 className="h-4 w-4" />}
+          </button>
+
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.02"
+            value={isMuted ? 0 : volume}
+            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+            className="h-1.5 w-full cursor-pointer accent-moss bg-secondary-foreground/20 rounded-lg appearance-none"
+            aria-label="Soundscape volume slider"
+          />
+
+          <span className="text-[11px] tabular-nums font-mono text-muted-foreground/80 w-8 text-right shrink-0">
+            {Math.round((isMuted ? 0 : volume) * 100)}%
+          </span>
+        </div>
       </div>
     </div>
   );
