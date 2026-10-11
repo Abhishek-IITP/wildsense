@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Search, X, Download, FileText, Upload, Sparkles, Compass, Tag, Smile, Clock } from "lucide-react";
+import { Search, X, Download, FileText, Upload, Sparkles, Tag, Clock } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/ws/SiteHeader";
 import { Arrow, FieldNote, btn } from "@/components/ws/ui";
 import { actions, useStore } from "@/lib/store";

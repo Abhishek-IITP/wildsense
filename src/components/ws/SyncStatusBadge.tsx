@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Cloud, CloudCheck, CloudOff, RefreshCw } from "lucide-react";
+import { Cloud, CloudOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { actions, useStore } from "@/lib/store";
 import { sendSyncBatch } from "@/lib/api/sync";
@@ -9,7 +9,7 @@ import type { SyncMutation } from "@/types";
 import { cn } from "@/lib/utils";
 
 export function SyncStatusBadge({ className }: { className?: string }) {
-  const { journal, missions } = useStore();
+  const { journal } = useStore();
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [syncing, setSyncing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);

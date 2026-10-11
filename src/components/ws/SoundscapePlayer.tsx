@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX, Play, Pause, Trees, Waves, CloudRain, Moon, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Volume2, VolumeX, Play, Pause, Trees, Waves, CloudRain, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type SoundPreset = "forest" | "brook" | "rain" | "dusk";

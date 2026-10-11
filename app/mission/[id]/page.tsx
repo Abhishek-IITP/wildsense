@@ -146,9 +146,6 @@ function useTimer() {
   return { elapsed, running, toggle };
 }
 
-import { SoundscapePlayer } from "@/components/ws/SoundscapePlayer";
-import { Check } from "lucide-react";
-
 function Active({ m, onFinish }: { m: Mission; onFinish: (mins: number) => void }) {
   const { elapsed, running, toggle } = useTimer();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
