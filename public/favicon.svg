@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f291e"/>
+      <stop offset="50%" stop-color="#0a1a12"/>
+      <stop offset="100%" stop-color="#050e09"/>
+    </linearGradient>
+
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6ee7b7" stop-opacity="0.6"/>
+      <stop offset="40%" stop-color="#10b981" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#047857" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <!-- Leaf Gradients -->
+    <linearGradient id="leafLeft" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#6ee7b7"/>
+      <stop offset="45%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <linearGradient id="leafRight" x1="80%" y1="0%" x2="20%" y2="100%">
+      <stop offset="0%" stop-color="#a7f3d0"/>
+      <stop offset="50%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+
+    <linearGradient id="stemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="60%" stop-color="#a7f3d0"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Glow & Lighting -->
+    <radialGradient id="centerGlow" cx="50%" cy="45%" r="45%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.32"/>
+      <stop offset="60%" stop-color="#10b981" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0a1a12" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="dewdrop" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#fef08a"/>
+      <stop offset="80%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.65"/>
+    </filter>
+    <filter id="dewGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base with Soft Shadow -->
+  <rect x="28" y="28" width="456" height="456" rx="124" fill="url(#bgGrad)" filter="url(#softShadow)"/>
+  <rect x="28" y="28" width="456" height="456" rx="124" fill="url(#centerGlow)"/>
+  
+  <!-- Polished Glass Rim -->
+  <rect x="29" y="29" width="454" height="454" rx="123" fill="none" stroke="url(#rimGrad)" stroke-width="4.5"/>
+
+  <!-- Botanical Emblem -->
+  <g id="sprout" filter="url(#softShadow)">
+    <!-- Left Canopy Leaf -->
+    <path d="M 256 310 C 220 280 152 230 152 165 C 152 108 202 88 256 122 C 242 168 248 245 256 310 Z"
+          fill="url(#leafLeft)"
+          opacity="0.95"/>
+
+    <!-- Right Canopy Leaf (Slightly higher & organic) -->
+    <path d="M 256 310 C 290 270 360 215 360 148 C 360 96 308 78 256 122 C 270 168 264 245 256 310 Z"
+          fill="url(#leafRight)"
+          opacity="0.98"/>
+
+    <!-- Central Living Stem -->
+    <path d="M 256 405 C 256 330 254 260 256 126"
+          stroke="url(#stemGrad)"
+          stroke-width="14"
+          stroke-linecap="round"/>
+
+    <!-- Accent Leaf Node Curve -->
+    <path d="M 256 310 C 228 322 195 316 174 290 C 196 270 232 284 256 300"
+          fill="#34d399"
+          opacity="0.85"/>
+    <path d="M 256 265 C 284 278 318 272 338 244 C 316 226 280 240 256 256"
+          fill="#6ee7b7"
+          opacity="0.9"/>
+  </g>
+
+  <!-- Luminous Golden Dewdrop / Compass Star -->
+  <g filter="url(#dewGlow)">
+    <circle cx="256" cy="116" r="16" fill="url(#dewdrop)"/>
+    <circle cx="253" cy="113" r="4.5" fill="#ffffff" opacity="0.9"/>
+    <!-- Gentle Star Sparkle Rays -->
+    <path d="M 256 94 L 256 138 M 234 116 L 278 116" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
+  </g>
+</svg>
