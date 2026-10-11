@@ -23,7 +23,9 @@ export default function MissionPage() {
   const [minutes, setMinutes] = useState(0);
   const [entry, setEntry] = useState<JournalEntry | null>(null);
 
-  useEffect(() => window.scrollTo(0, 0), [phase]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [phase]);
 
   if (loading) {
     return (
